@@ -15,12 +15,11 @@ import com.showflix.app.dao.entity.Directors;
 import com.showflix.app.dao.entity.Genere;
 import com.showflix.app.dao.entity.Languages;
 import com.showflix.app.dao.entity.Writers;
-
+import com.showflix.app.dao.exceptions.DAOException;
 
 @Repository("showEntityDaoImpl")
 public class ShowEntityDaoImpl implements IShowEntityDao {
-	
-	
+
 	@Autowired
 	ShowEntitesDao<Actors> actorsDao;
 
@@ -44,42 +43,49 @@ public class ShowEntityDaoImpl implements IShowEntityDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getEntityByName(Class<T> entityClass, String name , boolean createNew) {
-			T t = (T) getEntityDao(entityClass).getByName(name,entityClass.getSimpleName());
-			if(t == null && createNew){
-				Method m;
-				try {
-					t = (T)(entityClass.newInstance());
-					m = entityClass.getMethod("setName", String.class);
-					m.invoke(t, name);
-				} catch (NoSuchMethodException | SecurityException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					e.printStackTrace();
-				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
+	public <T> T getEntityByName(Class<T> entityClass, String name, boolean createNew) throws DAOException {
+		T t = (T) getEntityDao(entityClass).getByName(name, entityClass.getSimpleName());
+		if (t == null && createNew) {
+			Method m;
+			try {
+				t = (T) (entityClass.newInstance());
+				m = entityClass.getMethod("setName", String.class);
+				m.invoke(t, name);
+			} catch (NoSuchMethodException | SecurityException e) {
+				throw new DAOException("Database Error @ ShowEntityDaoImpl :" + e.getMessage(), e.getCause());
+			} catch (IllegalAccessException e) {
+				throw new DAOException("Database Error @ ShowEntityDaoImpl :" + e.getMessage(), e.getCause());
+			} catch (IllegalArgumentException e) {
+				throw new DAOException("Database Error @ ShowEntityDaoImpl :" + e.getMessage(), e.getCause());
+			} catch (InvocationTargetException e) {
+				throw new DAOException("Database Error @ ShowEntityDaoImpl :" + e.getMessage(), e.getCause());
+			} catch (InstantiationException e) {
+				throw new DAOException("Database Error @ ShowEntityDaoImpl :" + e.getMessage(), e.getCause());
 			}
-	
+
+		}
+
 		return t;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getEntityById(Class<T> entityClass, Integer key) {
-		return (T) getEntityDao(entityClass).getById(key,entityClass.getSimpleName());
+	public <T> T getEntityById(Class<T> entityClass, Integer key) throws DAOException {
+		try {
+			return (T) getEntityDao(entityClass).getById(key, entityClass.getSimpleName());
+		} catch (Exception e) {
+			throw new DAOException("Database Error @ ShowEntityDaoImpl :" + e.getMessage(), e.getCause());
+		}
 	}
-	
+
 	@Override
-	public <T> void insertShowEntity(Class<T> entityClass, Object entityInstance) {
-		getEntityDao(entityClass).insert(entityInstance);
-		
+	public <T> void insertShowEntity(Class<T> entityClass, Object entityInstance) throws DAOException {
+		try {
+			getEntityDao(entityClass).insert(entityInstance);
+		} catch (Exception e) {
+			throw new DAOException("Database Error @ ShowEntityDaoImpl :" + e.getMessage(), e.getCause());
+		}
+
 	}
 
 	private <T> ShowEntitesDao<?> getEntityDao(Class<T> entityClass) {

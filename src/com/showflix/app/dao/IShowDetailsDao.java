@@ -3,22 +3,23 @@ package com.showflix.app.dao;
 import java.util.List;
 
 import com.showflix.app.dao.entity.ShowDetails;
+import com.showflix.app.dao.exceptions.DAOException;
 
 public interface IShowDetailsDao {
 
 
 	ShowDetails findById(int id);
 	
-	ShowDetails findByImdbId(String imdbId);
+	ShowDetails findByImdbId(String imdbId) throws DAOException;
 
-	boolean createShowDetails(ShowDetails showDetails);
+	void createShowDetails(ShowDetails showDetails) throws DAOException;
 	
-	boolean updateShowDetails(ShowDetails showDetails);
+	void updateShowDetails(ShowDetails showDetails) throws DAOException;
 	
-	ShowDetails deleteShowDetails(ShowDetails showDetails);
+	ShowDetails deleteShowDetails(ShowDetails showDetails) throws DAOException;
 	
-	List<ShowDetails> findAllShowDetails();
+	List<ShowDetails> findAllShowDetails() throws DAOException;
 
-	List<ShowDetails> findShowDetailsByName(String name);
+	List<ShowDetails> findShowDetailsByName(String name) throws DAOException;
 	
 }

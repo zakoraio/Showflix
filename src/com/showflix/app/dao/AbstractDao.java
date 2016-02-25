@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.showflix.app.dao.exceptions.DAOException;
+
 
 @Component("abstractDao")
 @Scope("prototype")
@@ -38,7 +40,7 @@ public class AbstractDao<PK extends Serializable, T> {
 		getSession().persist(entity);
 	}
 
-	public void save(T entity){
+	public void save(T entity) throws DAOException{
 		getSession().save(entity);
 	}
 	
