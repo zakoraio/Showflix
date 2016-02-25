@@ -1,4 +1,4 @@
-package test.showflix.app.service;
+package com.test.service;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
