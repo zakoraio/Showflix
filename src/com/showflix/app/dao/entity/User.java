@@ -19,6 +19,8 @@ import org.hibernate.annotations.CollectionId;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(uniqueConstraints=
 @UniqueConstraint(columnNames = {"userName"}))
@@ -28,16 +30,18 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name ="UserId")
 	private Integer id;
-	@Column(name ="FirstName")
+	@Column(name ="FirstName",nullable = false)
 	private String firstName;
 	@Column(name ="LastName")
 	private String lastName;
-	@Column(name ="UserName")
+	@Column(name ="UserName",nullable = false)
 	private String userName;
-	@Column(name ="Password")
+	@Column(name ="Password",nullable = false)
 	private String password;
+	@Column(name= "Email",nullable = false)
+	private String email;
 	
-	
+	@JsonIgnore
 	@ManyToMany(cascade = CascadeType.PERSIST)
 	@JoinTable(name = "UserRoles", joinColumns = @JoinColumn(name = "UserID") , 
 						   inverseJoinColumns = @JoinColumn(name = "RoleID") )
@@ -100,6 +104,14 @@ public class User {
 
 	public void setRoles(Collection<Role> roles) {
 		this.roles = roles;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 

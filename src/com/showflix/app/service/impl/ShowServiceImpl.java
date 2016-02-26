@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.showflix.app.controller.exception.ShowDetailsNotFoundException;
 import com.showflix.app.dao.IShowDetailsDao;
 import com.showflix.app.dao.IShowEntityDao;
 import com.showflix.app.dao.entity.Actors;
@@ -109,7 +110,7 @@ public class ShowServiceImpl implements IShowService {
 		}
 	}
 
-	private <T> List<T> fetchEntity(Class<T> entityClass, String entityDetails) {
+	private <T> List<T> fetchEntity(Class<T> entityClass, String entityDetails) throws ServiceException {
 
 		String[] details = entityDetails.split(",");
 		List<T> entities = new ArrayList<T>();
@@ -117,15 +118,14 @@ public class ShowServiceImpl implements IShowService {
 			try {
 				entities.add(showEntityDao.getEntityByName(entityClass, str.trim(), true));
 			} catch (DAOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new ServiceException(e.getMessage(),e.getCause());
 			}
 		}
 
 		return entities;
 	}
 
-	private ShowDetails fetchShowDetails(Details detail) throws ParseException {
+	private ShowDetails fetchShowDetails(Details detail) throws ParseException, ServiceException {
 		ShowDetails sd = new ShowDetails();
 		sd.fetch(detail);
 
@@ -160,6 +160,21 @@ public class ShowServiceImpl implements IShowService {
 
 		return sd;
 
+	}
+
+	@Override
+	public void deleteShow(String imdbId) throws ShowDetailsNotFoundException, ServiceException {
+		// TODO Auto-generated method stub
+		 try {
+			 ShowDetails existingShowDetails = showDetailsDao.findByImdbId(imdbId);
+			 if(existingShowDetails==null){
+				 throw new ShowDetailsNotFoundException();
+			 }
+			 showDetailsDao.deleteShowDetails(existingShowDetails);
+		} catch (DAOException e) {
+			throw new ServiceException(e.getMessage(),e.getCause());
+			
+		}
 	}
 
 	

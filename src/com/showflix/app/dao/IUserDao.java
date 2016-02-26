@@ -16,5 +16,8 @@ public interface IUserDao {
 	public User getUserById(Integer id) throws DAOException;
 	
 	public void deleteUser(User user) throws DAOException;
+	
+	public void updateUser( User user) throws DAOException;
+	
 
 }

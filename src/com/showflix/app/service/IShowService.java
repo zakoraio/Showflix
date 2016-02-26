@@ -2,6 +2,7 @@ package com.showflix.app.service;
 
 import java.util.List;
 
+import com.showflix.app.controller.exception.ShowDetailsNotFoundException;
 import com.showflix.app.dao.entity.ShowDetails;
 import com.showflix.app.dto.Details;
 import com.showflix.app.service.exceptions.ServiceException;
@@ -19,5 +20,7 @@ public interface IShowService {
 	public ShowDetails getShowById(Integer id) throws ServiceException;
 	
 	public ShowDetails getShowByImdbId(String imdbId) throws ServiceException;
+	
+	public void deleteShow(String imdbId) throws ShowDetailsNotFoundException, ServiceException;
 	
 }

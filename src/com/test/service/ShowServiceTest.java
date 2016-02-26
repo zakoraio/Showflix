@@ -3,7 +3,6 @@ package com.test.service;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.lang.reflect.Type;
-import java.text.ParseException;
 import java.util.List;
 
 import org.junit.Test;
@@ -21,8 +20,10 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.showflix.app.config.HibernateConfiguration;
+import com.showflix.app.dao.entity.User;
 import com.showflix.app.dto.Details;
 import com.showflix.app.service.IShowService;
+import com.showflix.app.service.IUserService;
 import com.showflix.app.service.exceptions.ServiceException;
 
 /**
@@ -39,11 +40,26 @@ public class ShowServiceTest extends AbstractTransactionalJUnit4SpringContextTes
 	@Autowired
 	IShowService showService;
 	
-	@Test
+	@Autowired
+	IUserService userService;
+	
+/*	@Test
 	public void testShowService() throws ServiceException{
 		Details details = loadMovies();
-		
 		showService.insertShowDetails(details);
+	}*/
+	
+	@Test 
+	public void testUserService() throws ServiceException{
+		User user = new User();
+		
+		user.setFirstName("Saurabh");
+		user.setLastName("Rai");
+		user.setUserName("saurabhrai2004");
+		user.setPassword("msdfmdshdsh");
+		
+		userService.assignRoleToNewUser(user, "admin");
+		
 	}
 
 	

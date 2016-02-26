@@ -75,4 +75,15 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements IUserDao 
 		}
 	}
 
+	@Override
+	public void updateUser(User user) throws DAOException {
+		try {
+			update(user);
+		} catch (Exception e) {
+			throw new DAOException("Database Error @ UserDaoImpl :" + e.getMessage(), e.getCause());
+		}
+		
+	}
+	
+
 }
