@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -36,7 +37,7 @@ public class ShowDetails {
 	private String rated;
 	private Date released;
 	private Integer runtime;
-	@ManyToMany(cascade = CascadeType.PERSIST)
+	@ManyToMany(cascade = CascadeType.PERSIST, fetch= FetchType.EAGER)
 	@JoinTable(name = "Show_Generes", joinColumns = @JoinColumn(name = "ShowId") , 
 						   inverseJoinColumns = @JoinColumn(name = "GenereId") )
 	@GenericGenerator(name="hilo-gen",strategy="hilo")
@@ -46,7 +47,7 @@ public class ShowDetails {
 		        generator = "hilo-gen"
 		    )
 	private Collection<Genere> generes;
-	@ManyToMany(cascade = CascadeType.PERSIST)
+	@ManyToMany(cascade = CascadeType.PERSIST,fetch= FetchType.EAGER)
 	@JoinTable(name = "Show_Directors", joinColumns = @JoinColumn(name = "ShowId") ,
 						   inverseJoinColumns = @JoinColumn(name = "DirectorId") )
 	@GenericGenerator(name="hilo-gen",strategy="hilo")
@@ -56,7 +57,7 @@ public class ShowDetails {
 	        generator = "hilo-gen"
 	    )
 	private Collection<Directors> directors;
-	@ManyToMany(cascade = CascadeType.PERSIST)
+	@ManyToMany(cascade = CascadeType.PERSIST,fetch= FetchType.EAGER)
 	@JoinTable(name = "Show_Writers", joinColumns = @JoinColumn(name = "ShowId")
 						 , inverseJoinColumns = @JoinColumn(name = "WriterId") )
 	@GenericGenerator(name="hilo-gen",strategy="hilo")
@@ -66,7 +67,7 @@ public class ShowDetails {
 	        generator = "hilo-gen"
 	    )
 	private Collection<Writers> writers;
-	@ManyToMany(cascade = CascadeType.PERSIST)
+	@ManyToMany(cascade = CascadeType.PERSIST,fetch= FetchType.EAGER)
 	@JoinTable(name = "Show_Actors", joinColumns = @JoinColumn(name = "ShowId")
 						 , inverseJoinColumns = @JoinColumn(name = "ActorId") )
 	@GenericGenerator(name="hilo-gen",strategy="hilo")
@@ -78,7 +79,7 @@ public class ShowDetails {
 	private Collection<Actors> actors;
 	@Column(length = 1000)
 	private String plot;
-	@ManyToMany(cascade = CascadeType.PERSIST)
+	@ManyToMany(cascade = CascadeType.PERSIST,fetch= FetchType.EAGER)
 	@JoinTable(name = "Show_Languages", joinColumns = @JoinColumn(name = "ShowId")
 						 , inverseJoinColumns = @JoinColumn(name = "LanguageId") )
 	@GenericGenerator(name="hilo-gen",strategy="hilo")
@@ -88,7 +89,7 @@ public class ShowDetails {
 	        generator = "hilo-gen"
 	    )
 	private Collection<Languages> languages;
-	@ManyToMany(cascade = CascadeType.PERSIST)
+	@ManyToMany(cascade = CascadeType.PERSIST,fetch= FetchType.EAGER)
 	@JoinTable(name = "Show_Countries", joinColumns = @JoinColumn(name = "ShowId")
 						, inverseJoinColumns = @JoinColumn(name = "CountriesId") )
 	@GenericGenerator(name="hilo-gen",strategy="hilo")
@@ -98,7 +99,7 @@ public class ShowDetails {
 	        generator = "hilo-gen"
 	    )
 	private Collection<Countries> countries;
-	@ManyToMany(cascade = CascadeType.PERSIST)
+	@ManyToMany(cascade = CascadeType.PERSIST,fetch= FetchType.EAGER)
 	@JoinTable(name = "Show_Awards", joinColumns = @JoinColumn(name = "ShowId")
 						 , inverseJoinColumns = @JoinColumn(name = "AwardId") )
 	@GenericGenerator(name="hilo-gen",strategy="hilo")

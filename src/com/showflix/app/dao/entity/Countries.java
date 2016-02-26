@@ -12,6 +12,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(uniqueConstraints=
 @UniqueConstraint(columnNames = {"CountryName"})) 
@@ -24,6 +26,7 @@ public class Countries {
 	@Column(name="CountryName")
 	private String name;
 	
+	@JsonIgnore
 	@ManyToMany(mappedBy="countries")
 	private Collection<ShowDetails> shows = new ArrayList<ShowDetails>();
 	

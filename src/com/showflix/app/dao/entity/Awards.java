@@ -12,6 +12,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(uniqueConstraints=
 @UniqueConstraint(columnNames = {"AwardName"})) 
@@ -23,6 +25,7 @@ public class Awards {
 	@Column(name="AwardName")
 	private String name;
 	
+	@JsonIgnore
 	@ManyToMany(mappedBy="awards")
 	private Collection<ShowDetails> shows = new ArrayList<ShowDetails>();
 	
