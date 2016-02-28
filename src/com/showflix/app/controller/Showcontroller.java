@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.showflix.app.controller.exception.InternalServerException;
 import com.showflix.app.controller.exception.ShowDetailsAlreadyExistsException;
 import com.showflix.app.controller.exception.ShowDetailsNotFoundException;
-import com.showflix.app.dao.entity.ShowDetails;
 import com.showflix.app.dto.Details;
 import com.showflix.app.dto.Message;
 import com.showflix.app.service.IShowService;
@@ -28,7 +27,7 @@ import io.swagger.annotations.ApiResponses;
 @RestController
 @RequestMapping("/shows")
 @Api(tags = "shows")
-public class Showcontroller{
+public class Showcontroller {
 
 	@Autowired
 	private IShowService showService;
@@ -37,12 +36,21 @@ public class Showcontroller{
 	@ApiOperation(value = "Find All Shows", notes = "Returns a list of the shows in the system.<br>Filters using an optional name parameter")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public List<ShowDetails> findAll(@RequestParam(required = false, value = "name") String filterByName) {
-		List<ShowDetails> shows = null;
+	public List<Details> findAll(@RequestParam(required = false, value = "name") String filterByName) throws InternalServerException, ShowDetailsNotFoundException {
+		List<Details> shows = null;
 		try {
+			if(filterByName!=null){
 			shows = showService.getShowByname(filterByName);
+			}
+			else{
+				shows = showService.getAllShows();
+			}
+			
+			if(shows == null){
+				throw new ShowDetailsNotFoundException();
+			}
 		} catch (ServiceException e) {
-
+			throw new InternalServerException();
 		}
 
 		return shows;
@@ -53,12 +61,15 @@ public class Showcontroller{
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 404, message = "Not Found"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public ShowDetails findOne(@PathVariable("imdbId") String imdbId) throws ShowDetailsNotFoundException {
-		ShowDetails showDetails = null;
+	public Details findOne(@PathVariable("imdbId") String imdbId) throws ShowDetailsNotFoundException, InternalServerException {
+		Details showDetails = null;
 		try {
 			showDetails = showService.getShowByImdbId(imdbId);
+			if(showDetails==null){
+				throw new ShowDetailsNotFoundException();
+			}
 		} catch (ServiceException e) {
-
+			throw new InternalServerException();
 		}
 		return showDetails;
 
@@ -69,7 +80,8 @@ public class Showcontroller{
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 400, message = "Bad Request"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public Message create(@RequestBody Details details) throws ShowDetailsAlreadyExistsException, InternalServerException {
+	public Message create(@RequestBody Details details)
+			throws ShowDetailsAlreadyExistsException, InternalServerException {
 		try {
 			showService.insertShowDetails(details);
 
@@ -89,7 +101,7 @@ public class Showcontroller{
 	public Message update(@PathVariable("imdbId") String imdbId, @RequestBody Details details)
 			throws ShowDetailsNotFoundException, InternalServerException {
 		try {
-			ShowDetails existingShowDetails = showService.getShowByImdbId(imdbId);
+			Details existingShowDetails = showService.getShowByImdbId(imdbId);
 			if (existingShowDetails == null) {
 				throw new ShowDetailsNotFoundException();
 			}

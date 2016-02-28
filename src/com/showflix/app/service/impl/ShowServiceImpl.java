@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.showflix.app.controller.exception.ShowDetailsNotFoundException;
 import com.showflix.app.dao.IShowDetailsDao;
@@ -23,6 +24,7 @@ import com.showflix.app.dto.Details;
 import com.showflix.app.service.IShowService;
 import com.showflix.app.service.exceptions.ServiceException;
 
+@Transactional
 @Service("showService")
 public class ShowServiceImpl implements IShowService {
 
@@ -33,81 +35,107 @@ public class ShowServiceImpl implements IShowService {
 	IShowDetailsDao showDetailsDao;
 
 	@Override
-	public void updateShowDetails(Details detail) throws ServiceException {
-	
+	public void updateShowDetails(Details detail) throws ServiceException, ShowDetailsNotFoundException {
 		try {
+			ShowDetails existingShowDetails = showDetailsDao.findByImdbId(detail.getImdbID());
+			if (existingShowDetails == null) {
+				throw new ShowDetailsNotFoundException();
+			}
+			showDetailsDao.deleteShowDetails(existingShowDetails);
 			ShowDetails showDetails = fetchShowDetails(detail);
-			showDetailsDao.updateShowDetails(showDetails);
+			showDetailsDao.createShowDetails(showDetails);
 		} catch (DAOException e) {
-			throw new ServiceException(e.getMessage(),e.getCause());
+			throw new ServiceException(e.getMessage(), e.getCause());
 		} catch (ParseException e) {
-			throw new ServiceException("Format of the show details is not valid ::"+e.getMessage(),e.getCause());
+			throw new ServiceException("Format of the show details is not valid ::" + e.getMessage(), e.getCause());
 		}
 	}
 
 	@Override
 	public void insertShowDetails(Details detail) throws ServiceException {
-		
-		
+
 		try {
 			ShowDetails showDetails = fetchShowDetails(detail);
 			showDetailsDao.createShowDetails(showDetails);
 		} catch (DAOException e) {
-			throw new ServiceException(e.getMessage(),e.getCause());
+			throw new ServiceException(e.getMessage(), e.getCause());
 		} catch (ParseException e) {
-			throw new ServiceException("Format of the show details is not valid ::"+e.getMessage(),e.getCause());
+			throw new ServiceException("Format of the show details is not valid ::" + e.getMessage(), e.getCause());
 		}
 
 	}
-	
-	
+
 	@Override
-	public List<ShowDetails> getAllShows() throws ServiceException {
+	public List<Details> getAllShows() throws ServiceException {
+		List<Details> details = null;
 		try {
-			return showDetailsDao.findAllShowDetails();
+			List<ShowDetails> showDetailList = showDetailsDao.findAllShowDetails();
+			if (showDetailList.size() == 0) {
+				return null;
+			}
+			details = new ArrayList<Details>();
+			for (ShowDetails sd : showDetailList) {
+				Details detail = new Details();
+				detail.fetch(sd);
+				details.add(detail);
+			}
+
 		} catch (DAOException e) {
-			throw new ServiceException(e.getMessage(),e.getCause());
+			throw new ServiceException(e.getMessage(), e.getCause());
 		}
+		return details;
 	}
 
 	@Override
-	public List<ShowDetails> getShowByname(String name) throws ServiceException {
+	public List<Details> getShowByname(String name) throws ServiceException {
+
+		List<Details> details = null;
 		try {
-			List<ShowDetails> showDetails =  showDetailsDao.findShowDetailsByName(name);
-			 
-			if(showDetails!=null){
-				return showDetails;
+			List<ShowDetails> showDetailList = showDetailsDao.findShowDetailsByName(name);
+			if (showDetailList.size() == 0) {
+				return null;
 			}
-			else{
-				throw new ServiceException("No Matches found in Database for the show " + name);
+			details = new ArrayList<Details>();
+			for (ShowDetails sd : showDetailList) {
+				Details detail = new Details();
+				detail.fetch(sd);
+				details.add(detail);
 			}
 		} catch (DAOException e) {
-			throw new ServiceException(e.getMessage(),e.getCause());
+			throw new ServiceException(e.getMessage(), e.getCause());
 		}
+		return details;
 	}
 
 	@Override
-	public ShowDetails getShowById(Integer id) throws ServiceException {
-		ShowDetails showDetails =  showDetailsDao.findById(id);
-		
-		if(showDetails!=null){
-			return showDetails;
+	public Details getShowById(Integer id) throws ServiceException {
+		ShowDetails showDetails = showDetailsDao.findById(id);
+
+		if (showDetails == null) {
+			return null;
 		}
-		throw new ServiceException("No Matches found in Database for show with ID "+ id);
+		Details detail = new Details();
+		detail.fetch(showDetails);
+
+		return detail;
 	}
 
 	@Override
-	public ShowDetails getShowByImdbId(String imdbId) throws ServiceException {
+	public Details getShowByImdbId(String imdbId) throws ServiceException {
+		Details detail = null;
 		try {
-			ShowDetails showDetails =  showDetailsDao.findByImdbId(imdbId);
-			
-			if(showDetails!=null){
-				return showDetails;
+			ShowDetails showDetails = showDetailsDao.findByImdbId(imdbId);
+
+			if (showDetails == null) {
+				return null;
 			}
-			throw new ServiceException("No Matches found in Database for show with imdbID "+ imdbId);
+			detail = new Details();
+			detail.fetch(showDetails);
+
 		} catch (DAOException e) {
-			throw new ServiceException(e.getMessage(),e.getCause());
+			throw new ServiceException(e.getMessage(), e.getCause());
 		}
+		return detail;
 	}
 
 	private <T> List<T> fetchEntity(Class<T> entityClass, String entityDetails) throws ServiceException {
@@ -118,7 +146,7 @@ public class ShowServiceImpl implements IShowService {
 			try {
 				entities.add(showEntityDao.getEntityByName(entityClass, str.trim(), true));
 			} catch (DAOException e) {
-				throw new ServiceException(e.getMessage(),e.getCause());
+				throw new ServiceException(e.getMessage(), e.getCause());
 			}
 		}
 
@@ -145,7 +173,7 @@ public class ShowServiceImpl implements IShowService {
 			dir.getShows().add(sd);
 			sd.getDirectors().add(dir);
 		}
-		for (Genere gen : fetchEntity(Genere.class, detail.getGenere())) {
+		for (Genere gen : fetchEntity(Genere.class, detail.getGenre())) {
 			gen.getShows().add(sd);
 			sd.getGeneres().add(gen);
 		}
@@ -165,18 +193,16 @@ public class ShowServiceImpl implements IShowService {
 	@Override
 	public void deleteShow(String imdbId) throws ShowDetailsNotFoundException, ServiceException {
 		// TODO Auto-generated method stub
-		 try {
-			 ShowDetails existingShowDetails = showDetailsDao.findByImdbId(imdbId);
-			 if(existingShowDetails==null){
-				 throw new ShowDetailsNotFoundException();
-			 }
-			 showDetailsDao.deleteShowDetails(existingShowDetails);
+		try {
+			ShowDetails existingShowDetails = showDetailsDao.findByImdbId(imdbId);
+			if (existingShowDetails == null) {
+				throw new ShowDetailsNotFoundException();
+			}
+			showDetailsDao.deleteShowDetails(existingShowDetails);
 		} catch (DAOException e) {
-			throw new ServiceException(e.getMessage(),e.getCause());
-			
+			throw new ServiceException(e.getMessage(), e.getCause());
+
 		}
 	}
-
-	
 
 }

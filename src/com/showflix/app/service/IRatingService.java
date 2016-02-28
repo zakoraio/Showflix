@@ -5,8 +5,6 @@ import com.showflix.app.service.exceptions.ServiceException;
 
 public interface IRatingService {
 	
-	public void updateRating(ShowRating rating) throws ServiceException;
-	
 	public void addRating(ShowRating rating) throws ServiceException;
 	
 	public double getAvgRatingForShow(String imdbId) throws ServiceException;

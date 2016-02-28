@@ -6,6 +6,7 @@ import java.util.Collection;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -42,7 +43,7 @@ public class User {
 	private String email;
 	
 	@JsonIgnore
-	@ManyToMany(cascade = CascadeType.PERSIST)
+	@ManyToMany(cascade = CascadeType.PERSIST,fetch =FetchType.EAGER)
 	@JoinTable(name = "UserRoles", joinColumns = @JoinColumn(name = "UserID") , 
 						   inverseJoinColumns = @JoinColumn(name = "RoleID") )
 	@GenericGenerator(name="hilo-gen",strategy="hilo")
@@ -115,5 +116,11 @@ public class User {
 	}
 
 
+	public void fetch(User user){
+		this.email = user.email;
+		this.firstName = user.firstName;
+		this.lastName = user.lastName;
+		this.password = user.password;
+	}
 
 }

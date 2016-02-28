@@ -13,4 +13,6 @@ public interface IRatingDao {
 	
 	public void updateRating(ShowRating rating) throws DAOException;
 
+	public ShowRating getRatingForShowByUser(String imdbId , String userName) throws DAOException;
+	
 }

@@ -21,8 +21,8 @@ public interface IUserService {
 	
 	public void assignRoleToNewUser(User user , String roleName)throws ServiceException, UserAlreadyExistsException;
 	
-	public void updateUser(User user) throws ServiceException;
+	public User updateUser(User user) throws ServiceException;
 	
-	public void deleteUser(User user) throws ServiceException;
+	public User deleteUser(String userName) throws ServiceException;
 
 }

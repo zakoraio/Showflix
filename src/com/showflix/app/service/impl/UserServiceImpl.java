@@ -42,7 +42,7 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public void addUser(User user) throws ServiceException, UserAlreadyExistsException {
-		assignRoleToNewUser(user,"customer");
+		assignRoleToNewUser(user,"user");
 
 	}
 
@@ -124,22 +124,34 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public void updateUser(User user) throws ServiceException {
+	public User updateUser(User user) throws ServiceException {
 		try {
-			userDao.updateUser(user);
+			User existingUser = userDao.getUserByUserName(user.getUserName());
+			if (existingUser == null) {
+				return null;
+			}
+			existingUser.fetch(user);
+			userDao.updateUser(existingUser);
 		} catch (DAOException e) {
 			throw new ServiceException(e.getMessage(), e.getCause());
 		}
+		return user;
 
 	}
 
 	@Override
-	public void deleteUser(User user) throws ServiceException {
+	public User deleteUser(String userName) throws ServiceException {
+		User existingUser = null;
 		try {
-			userDao.deleteUser(user);
+			existingUser = userDao.getUserByUserName(userName);
+			if(existingUser == null){
+				return null;
+			}
+			userDao.deleteUser(existingUser);
 		} catch (DAOException e) {
 			throw new ServiceException(e.getMessage(), e.getCause());
 		}
+		return existingUser;
 
 	}
 }

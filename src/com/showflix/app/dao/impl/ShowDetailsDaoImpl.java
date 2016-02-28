@@ -2,8 +2,7 @@ package com.showflix.app.dao.impl;
 
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 
 import com.showflix.app.dao.AbstractDao;
@@ -28,13 +27,13 @@ public class ShowDetailsDaoImpl extends AbstractDao<Integer, ShowDetails> implem
 		}
 	}
 
-	public List<ShowDetails> findShowDetailsByName(String name) throws DAOException {
+	public List<ShowDetails> findShowDetailsByName(String movieName) throws DAOException {
 		try{
-			Criteria criteria = createEntityCriteria();
-			criteria.add(Restrictions.eq("name", name).ignoreCase());
+			Query query  = getSession().createQuery("from "+getEntityName()+ " where lower(title) like :movieName");
+			query.setString("movieName", '%'+movieName.toLowerCase()+'%');
 
 			@SuppressWarnings("unchecked")
-			List<ShowDetails> showList = (List<ShowDetails>) criteria.list();
+			List<ShowDetails> showList = (List<ShowDetails>) query.list();
 
 			return showList;
 		}
@@ -48,12 +47,16 @@ public class ShowDetailsDaoImpl extends AbstractDao<Integer, ShowDetails> implem
 	@Override
 	public ShowDetails findByImdbId(String imDbId) throws DAOException {
 		try {
-			Criteria criteria = createEntityCriteria();
-			criteria.add(Restrictions.eq("imdbID", imDbId));
+			Query query  = getSession().createQuery("from "+getEntityName()+ " where imdbId = :imdbID");
+			query.setString("imdbID", imDbId);
 
 			@SuppressWarnings("unchecked")
-			List<ShowDetails> showList = (List<ShowDetails>) criteria.list();
+			List<ShowDetails> showList = (List<ShowDetails>) query.list();
+			if(showList.size()>0){
 			return showList.get(0);
+			}
+			return null;
+			
 		} catch (Exception e) {
 			throw new DAOException("Database Error @ ShowDetailsDaoImpl ::" + e.getMessage(), e.getCause());
 		}
@@ -63,8 +66,8 @@ public class ShowDetailsDaoImpl extends AbstractDao<Integer, ShowDetails> implem
 	@Override
 	public List<ShowDetails> findAllShowDetails() throws DAOException {
 		try {
-			Criteria criteria = createEntityCriteria();
-			return (List<ShowDetails>) criteria.list();
+			Query query  = getSession().createQuery("from "+getEntityName());
+			return (List<ShowDetails>) query.list();
 		} catch (Exception e) {
 			throw new DAOException("Database Error @ ShowDetailsDaoImpl ::" + e.getMessage(), e.getCause());
 		}

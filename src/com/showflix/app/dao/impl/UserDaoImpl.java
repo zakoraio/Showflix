@@ -26,22 +26,20 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements IUserDao 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<User> getUserByName(String name) throws DAOException {
-		try{
-		Criteria criteria = createEntityCriteria();
-		criteria.add(Restrictions.eq("firstName", name).ignoreCase());
-		return (List<User>) criteria.list();
-		}
-		catch(Exception e){
+		try {
+			Criteria criteria = createEntityCriteria();
+			criteria.add(Restrictions.eq("firstName", name).ignoreCase());
+			return (List<User>) criteria.list();
+		} catch (Exception e) {
 			throw new DAOException("Database Error @ UserDaoImpl :" + e.getMessage(), e.getCause());
 		}
 	}
 
 	@Override
 	public void deleteUser(User user) throws DAOException {
-		try{
-		delete(user);
-		}
-		catch(Exception e){
+		try {
+			delete(user);
+		} catch (Exception e) {
 			throw new DAOException("Database Error @ UserDaoImpl :" + e.getMessage(), e.getCause());
 		}
 
@@ -49,28 +47,26 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements IUserDao 
 
 	@Override
 	public User getUserById(Integer id) throws DAOException {
-		try{
-		return getByKey(id);
-		}
-		catch(Exception e){
+		try {
+			return getByKey(id);
+		} catch (Exception e) {
 			throw new DAOException("Database Error @ UserDaoImpl :" + e.getMessage(), e.getCause());
 		}
 	}
 
 	@Override
 	public User getUserByUserName(String userName) throws DAOException {
-		try{
-		Criteria criteria = createEntityCriteria();
-		criteria.add(Restrictions.eq("userName", userName).ignoreCase());
+		try {
+			Criteria criteria = createEntityCriteria();
+			criteria.add(Restrictions.eq("userName", userName).ignoreCase());
 
-		@SuppressWarnings("unchecked")
-		List<User> userList = (List<User>) criteria.list();
-		if (userList.size() > 0) {
-			return userList.get(0);
-		}
-		return null;
-		}
-		catch(Exception e){
+			@SuppressWarnings("unchecked")
+			List<User> userList = (List<User>) criteria.list();
+			if (userList.size() > 0) {
+				return userList.get(0);
+			}
+			return null;
+		} catch (Exception e) {
 			throw new DAOException("Database Error @ UserDaoImpl :" + e.getMessage(), e.getCause());
 		}
 	}
@@ -82,8 +78,7 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements IUserDao 
 		} catch (Exception e) {
 			throw new DAOException("Database Error @ UserDaoImpl :" + e.getMessage(), e.getCause());
 		}
-		
+
 	}
-	
 
 }

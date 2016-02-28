@@ -152,7 +152,7 @@ public class ShowDetails {
 		catch(NumberFormatException nfe){
 			imdbVotes=0L;
 		}
-		imdbId = details.getImdbId();
+		imdbId = details.getImdbID();
 		type = details.getType();
 	}
 
