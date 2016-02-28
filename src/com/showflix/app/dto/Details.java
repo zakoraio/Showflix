@@ -36,6 +36,7 @@ public class Details {
 	private String imdbVotes;
 	private String imdbID;
 	private String type;
+	private String showflixRating;
 
 
 	public String getTitle() {
@@ -190,6 +191,14 @@ public class Details {
 		this.type = type;
 	}
 
+	public String getShowflixRating() {
+		return showflixRating;
+	}
+
+	public void setShowflixRating(String showflixRating) {
+		this.showflixRating = showflixRating;
+	}
+
 	public void fetch(ShowDetails details){
 		title = details.getTitle();
 		year = details.getYear();
@@ -206,6 +215,7 @@ public class Details {
 		imdbVotes = details.getImdbVotes().toString();
 		imdbID = details.getImdbId();
 		type = details.getType();
+		showflixRating = details.getShowFlixRating().toString();
 		genre = getConcatinatedString((List<Genere>)details.getGeneres(),Genere.class);
 		actors = getConcatinatedString((List<Actors>)details.getActors(),Actors.class);
 		director = getConcatinatedString((List<Directors>)details.getDirectors(),Directors.class);

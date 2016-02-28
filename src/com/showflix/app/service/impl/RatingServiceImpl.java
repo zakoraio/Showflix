@@ -6,13 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.showflix.app.controller.exception.ShowDetailsNotFoundException;
 import com.showflix.app.dao.IRatingDao;
-import com.showflix.app.dao.IShowDetailsDao;
 import com.showflix.app.dao.entity.ShowRating;
 import com.showflix.app.dao.exceptions.DAOException;
+import com.showflix.app.dto.Details;
 import com.showflix.app.service.IRatingService;
+import com.showflix.app.service.IShowService;
 import com.showflix.app.service.exceptions.ServiceException;
-
 
 @Transactional
 @Service("ratingService")
@@ -22,23 +23,31 @@ public class RatingServiceImpl implements IRatingService {
 	IRatingDao ratingDao;
 
 	@Autowired
-	IShowDetailsDao showDetailsDao;
-
-	
+	IShowService showService;
 
 	@Override
 	public void addRating(ShowRating rating) throws ServiceException {
-		
+
 		try {
-			
+
 			ShowRating existingRating = ratingDao.getRatingForShowByUser(rating.getImdbId(), rating.getUserName());
-			if(existingRating!=null){
+			if (existingRating != null) {
 				existingRating.setRating(rating.getRating());
 				ratingDao.updateRating(existingRating);
 			}
-			
+
 			ratingDao.createRating(rating);
-		} catch (DAOException e) {
+			
+			Double avgShowFlixRating = getAvgRatingForShow(rating.getImdbId());
+			
+			Details detail = showService.getShowByImdbId(rating.getImdbId());
+			
+			detail.setShowflixRating(avgShowFlixRating.toString());
+			
+			showService.updateShowDetails(detail);
+			
+			
+		} catch (DAOException | ShowDetailsNotFoundException e) {
 			throw new ServiceException(e.getMessage(), e.getCause());
 		}
 	}
@@ -46,23 +55,24 @@ public class RatingServiceImpl implements IRatingService {
 	@Override
 	public double getAvgRatingForShow(String imdbId) throws ServiceException {
 		try {
-		
-				List<ShowRating> ratings = ratingDao.getAllRatingForShow(imdbId);
 
-				double avgRating = 0;
+			List<ShowRating> ratings = ratingDao.getAllRatingForShow(imdbId);
 
-				for (ShowRating rating : ratings) {
-					avgRating += rating.getRating();
-				}
+			double avgRating = 0;
 
-				if (avgRating > 0) {
-					avgRating /= ratings.size();
-				}
+			for (ShowRating rating : ratings) {
+				avgRating += rating.getRating();
+			}
 
-				return avgRating;
+			if (avgRating > 0) {
+				avgRating /= ratings.size();
+			}
+
+			return avgRating;
 		} catch (DAOException e) {
 			throw new ServiceException(e.getMessage(), e.getCause());
 		}
 	}
+
 
 }

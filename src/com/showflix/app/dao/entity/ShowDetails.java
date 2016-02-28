@@ -37,77 +37,42 @@ public class ShowDetails {
 	private String rated;
 	private Date released;
 	private Integer runtime;
-	@ManyToMany(cascade = CascadeType.PERSIST, fetch= FetchType.EAGER)
-	@JoinTable(name = "Show_Generes", joinColumns = @JoinColumn(name = "ShowId") , 
-						   inverseJoinColumns = @JoinColumn(name = "GenereId") )
-	@GenericGenerator(name="hilo-gen",strategy="hilo")
-	@CollectionId(
-		        columns = @Column(name="ShowGenereID"), 
-		        type=@Type(type="long"), 
-		        generator = "hilo-gen"
-		    )
+	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	@JoinTable(name = "Show_Generes", joinColumns = @JoinColumn(name = "ShowId") , inverseJoinColumns = @JoinColumn(name = "GenereId") )
+	@GenericGenerator(name = "hilo-gen", strategy = "hilo")
+	@CollectionId(columns = @Column(name = "ShowGenereID") , type = @Type(type = "long") , generator = "hilo-gen")
 	private Collection<Genere> generes;
-	@ManyToMany(cascade = CascadeType.PERSIST,fetch= FetchType.EAGER)
-	@JoinTable(name = "Show_Directors", joinColumns = @JoinColumn(name = "ShowId") ,
-						   inverseJoinColumns = @JoinColumn(name = "DirectorId") )
-	@GenericGenerator(name="hilo-gen",strategy="hilo")
-	@CollectionId(
-	        columns = @Column(name="ShowDirectorID"), 
-	        type=@Type(type="long"), 
-	        generator = "hilo-gen"
-	    )
+	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	@JoinTable(name = "Show_Directors", joinColumns = @JoinColumn(name = "ShowId") , inverseJoinColumns = @JoinColumn(name = "DirectorId") )
+	@GenericGenerator(name = "hilo-gen", strategy = "hilo")
+	@CollectionId(columns = @Column(name = "ShowDirectorID") , type = @Type(type = "long") , generator = "hilo-gen")
 	private Collection<Directors> directors;
-	@ManyToMany(cascade = CascadeType.PERSIST,fetch= FetchType.EAGER)
-	@JoinTable(name = "Show_Writers", joinColumns = @JoinColumn(name = "ShowId")
-						 , inverseJoinColumns = @JoinColumn(name = "WriterId") )
-	@GenericGenerator(name="hilo-gen",strategy="hilo")
-	@CollectionId(
-	        columns = @Column(name="ShowWriterID"), 
-	        type=@Type(type="long"), 
-	        generator = "hilo-gen"
-	    )
+	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	@JoinTable(name = "Show_Writers", joinColumns = @JoinColumn(name = "ShowId") , inverseJoinColumns = @JoinColumn(name = "WriterId") )
+	@GenericGenerator(name = "hilo-gen", strategy = "hilo")
+	@CollectionId(columns = @Column(name = "ShowWriterID") , type = @Type(type = "long") , generator = "hilo-gen")
 	private Collection<Writers> writers;
-	@ManyToMany(cascade = CascadeType.PERSIST,fetch= FetchType.EAGER)
-	@JoinTable(name = "Show_Actors", joinColumns = @JoinColumn(name = "ShowId")
-						 , inverseJoinColumns = @JoinColumn(name = "ActorId") )
-	@GenericGenerator(name="hilo-gen",strategy="hilo")
-	@CollectionId(
-	        columns = @Column(name="ShowActorID"), 
-	        type=@Type(type="long"), 
-	        generator = "hilo-gen"
-	    )
+	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	@JoinTable(name = "Show_Actors", joinColumns = @JoinColumn(name = "ShowId") , inverseJoinColumns = @JoinColumn(name = "ActorId") )
+	@GenericGenerator(name = "hilo-gen", strategy = "hilo")
+	@CollectionId(columns = @Column(name = "ShowActorID") , type = @Type(type = "long") , generator = "hilo-gen")
 	private Collection<Actors> actors;
 	@Column(length = 1000)
 	private String plot;
-	@ManyToMany(cascade = CascadeType.PERSIST,fetch= FetchType.EAGER)
-	@JoinTable(name = "Show_Languages", joinColumns = @JoinColumn(name = "ShowId")
-						 , inverseJoinColumns = @JoinColumn(name = "LanguageId") )
-	@GenericGenerator(name="hilo-gen",strategy="hilo")
-	@CollectionId(
-	        columns = @Column(name="ShowLanguageID"), 
-	        type=@Type(type="long"), 
-	        generator = "hilo-gen"
-	    )
+	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	@JoinTable(name = "Show_Languages", joinColumns = @JoinColumn(name = "ShowId") , inverseJoinColumns = @JoinColumn(name = "LanguageId") )
+	@GenericGenerator(name = "hilo-gen", strategy = "hilo")
+	@CollectionId(columns = @Column(name = "ShowLanguageID") , type = @Type(type = "long") , generator = "hilo-gen")
 	private Collection<Languages> languages;
-	@ManyToMany(cascade = CascadeType.PERSIST,fetch= FetchType.EAGER)
-	@JoinTable(name = "Show_Countries", joinColumns = @JoinColumn(name = "ShowId")
-						, inverseJoinColumns = @JoinColumn(name = "CountriesId") )
-	@GenericGenerator(name="hilo-gen",strategy="hilo")
-	@CollectionId(
-	        columns = @Column(name="ShowCountrieID"), 
-	        type=@Type(type="long"), 
-	        generator = "hilo-gen"
-	    )
+	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	@JoinTable(name = "Show_Countries", joinColumns = @JoinColumn(name = "ShowId") , inverseJoinColumns = @JoinColumn(name = "CountriesId") )
+	@GenericGenerator(name = "hilo-gen", strategy = "hilo")
+	@CollectionId(columns = @Column(name = "ShowCountrieID") , type = @Type(type = "long") , generator = "hilo-gen")
 	private Collection<Countries> countries;
-	@ManyToMany(cascade = CascadeType.PERSIST,fetch= FetchType.EAGER)
-	@JoinTable(name = "Show_Awards", joinColumns = @JoinColumn(name = "ShowId")
-						 , inverseJoinColumns = @JoinColumn(name = "AwardId") )
-	@GenericGenerator(name="hilo-gen",strategy="hilo")
-	@CollectionId(
-	        columns = @Column(name="ShowAwardID"), 
-	        type=@Type(type="long"), 
-	        generator = "hilo-gen"
-	    )
+	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	@JoinTable(name = "Show_Awards", joinColumns = @JoinColumn(name = "ShowId") , inverseJoinColumns = @JoinColumn(name = "AwardId") )
+	@GenericGenerator(name = "hilo-gen", strategy = "hilo")
+	@CollectionId(columns = @Column(name = "ShowAwardID") , type = @Type(type = "long") , generator = "hilo-gen")
 	private Collection<Awards> awards;
 	private String poster;
 	private Integer metascore;
@@ -115,6 +80,7 @@ public class ShowDetails {
 	private Long imdbVotes;
 	private String imdbId;
 	private String type;
+	private Double showFlixRating;
 
 	public void fetch(Details details) throws ParseException {
 		title = details.getTitle();
@@ -130,30 +96,32 @@ public class ShowDetails {
 		} catch (NumberFormatException nfe) {
 			runtime = 0;
 		}
-	
+
 		plot = details.getPlot();
 
 		poster = details.getPoster();
-		try{
-		metascore = Integer.parseInt(details.getMetascore().trim());
-		}
-		catch(NumberFormatException nfe){
+		try {
+			metascore = Integer.parseInt(details.getMetascore().trim());
+		} catch (NumberFormatException nfe) {
 			metascore = 0;
 		}
-		try{
-		imdbRating = Double.parseDouble(details.getImdbRating().trim());
+		try {
+			imdbRating = Double.parseDouble(details.getImdbRating().trim());
+		} catch (NumberFormatException nfe) {
+			imdbRating = 0.0;
 		}
-		catch(NumberFormatException nfe){
-			imdbRating=0.0;
-		}
-		try{
-		imdbVotes = Long.parseLong(details.getImdbVotes().replace(",", "").trim());
-		}
-		catch(NumberFormatException nfe){
-			imdbVotes=0L;
+		try {
+			imdbVotes = Long.parseLong(details.getImdbVotes().replace(",", "").trim());
+		} catch (NumberFormatException nfe) {
+			imdbVotes = 0L;
 		}
 		imdbId = details.getImdbID();
 		type = details.getType();
+		try {
+			showFlixRating = Double.parseDouble(details.getShowflixRating().replace(",", "").trim());
+		} catch (NumberFormatException nfe) {
+			showFlixRating = 0.0;
+		}
 	}
 
 	public int getId() {
@@ -352,17 +320,26 @@ public class ShowDetails {
 		months.put("Nov", "11");
 		months.put("Dec", "12");
 	}
-	
-	public int hashCode(){
-		return title.hashCode()^Integer.valueOf(id).hashCode();
+
+	public int hashCode() {
+		return title.hashCode() ^ Integer.valueOf(id).hashCode();
 	}
-	public boolean equals(Object o){
-		if(o instanceof ShowDetails){
-			if(((ShowDetails)o).getImdbId().equals(imdbId)){
+
+	public boolean equals(Object o) {
+		if (o instanceof ShowDetails) {
+			if (((ShowDetails) o).getImdbId().equals(imdbId)) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	public Double getShowFlixRating() {
+		return showFlixRating;
+	}
+
+	public void setShowFlixRating(Double showFlixRating) {
+		this.showFlixRating = showFlixRating;
 	}
 
 }

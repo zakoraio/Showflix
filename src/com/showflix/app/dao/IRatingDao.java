@@ -15,4 +15,6 @@ public interface IRatingDao {
 
 	public ShowRating getRatingForShowByUser(String imdbId , String userName) throws DAOException;
 	
+	public List<ShowRating> getAllRatingsHighToLow(Integer max) throws DAOException;;
+	
 }

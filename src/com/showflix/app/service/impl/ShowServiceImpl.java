@@ -137,7 +137,7 @@ public class ShowServiceImpl implements IShowService {
 		}
 		return detail;
 	}
-
+	
 	private <T> List<T> fetchEntity(Class<T> entityClass, String entityDetails) throws ServiceException {
 
 		String[] details = entityDetails.split(",");
@@ -203,6 +203,48 @@ public class ShowServiceImpl implements IShowService {
 			throw new ServiceException(e.getMessage(), e.getCause());
 
 		}
+	}
+
+	@Override
+	public List<Details> getTopRatedShowsByImdbRating(Integer max) throws ShowDetailsNotFoundException, ServiceException {
+
+		List<Details> details = null;
+		try {
+			List<ShowDetails> showDetailList = showDetailsDao.getTopRatedShowsByImdbRating(max);
+			if (showDetailList.size() == 0) {
+				return null;
+			}
+			details = new ArrayList<Details>();
+			for (ShowDetails sd : showDetailList) {
+				Details detail = new Details();
+				detail.fetch(sd);
+				details.add(detail);
+			}
+		} catch (DAOException e) {
+			throw new ServiceException(e.getMessage(), e.getCause());
+		}
+		return details;
+	}
+	
+	@Override
+	public List<Details> getTopRatedShowsByShowFlixRating(Integer max) throws ShowDetailsNotFoundException, ServiceException {
+
+		List<Details> details = null;
+		try {
+			List<ShowDetails> showDetailList = showDetailsDao.getTopRatedShowsByShowFlixRating(max);
+			if (showDetailList.size() == 0) {
+				return null;
+			}
+			details = new ArrayList<Details>();
+			for (ShowDetails sd : showDetailList) {
+				Details detail = new Details();
+				detail.fetch(sd);
+				details.add(detail);
+			}
+		} catch (DAOException e) {
+			throw new ServiceException(e.getMessage(), e.getCause());
+		}
+		return details;
 	}
 
 }

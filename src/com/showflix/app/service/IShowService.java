@@ -22,4 +22,9 @@ public interface IShowService {
 	
 	public void deleteShow(String imdbId) throws ShowDetailsNotFoundException, ServiceException;
 	
+	public List<Details> getTopRatedShowsByImdbRating(Integer max) throws ShowDetailsNotFoundException, ServiceException;
+
+	List<Details> getTopRatedShowsByShowFlixRating(Integer max) throws ShowDetailsNotFoundException, ServiceException;
+
+	
 }

@@ -18,55 +18,86 @@ public class ShowDetailsDaoImpl extends AbstractDao<Integer, ShowDetails> implem
 	}
 
 	public ShowDetails deleteShowDetails(ShowDetails showDetails) throws DAOException {
-		try{
-		delete(showDetails);
-		return showDetails;
-		}
-		catch(Exception e){
+		try {
+			delete(showDetails);
+			return showDetails;
+		} catch (Exception e) {
 			throw new DAOException("Database Error @ ShowDetailsDaoImpl ::" + e.getMessage(), e.getCause());
 		}
 	}
 
 	public List<ShowDetails> findShowDetailsByName(String movieName) throws DAOException {
-		try{
-			Query query  = getSession().createQuery("from "+getEntityName()+ " where lower(title) like :movieName");
-			query.setString("movieName", '%'+movieName.toLowerCase()+'%');
+		try {
+			Query query = getSession().createQuery("from " + getEntityName() + " where lower(title) like :movieName");
+			query.setString("movieName", '%' + movieName.toLowerCase() + '%');
 
 			@SuppressWarnings("unchecked")
 			List<ShowDetails> showList = (List<ShowDetails>) query.list();
 
 			return showList;
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			throw new DAOException("Database Error @ ShowDetailsDaoImpl ::" + e.getMessage(), e.getCause());
 		}
-		
 
 	}
 
 	@Override
 	public ShowDetails findByImdbId(String imDbId) throws DAOException {
 		try {
-			Query query  = getSession().createQuery("from "+getEntityName()+ " where imdbId = :imdbID");
+			Query query = getSession().createQuery("from " + getEntityName() + " where imdbId = :imdbID");
 			query.setString("imdbID", imDbId);
 
 			@SuppressWarnings("unchecked")
 			List<ShowDetails> showList = (List<ShowDetails>) query.list();
-			if(showList.size()>0){
-			return showList.get(0);
+			if (showList.size() > 0) {
+				return showList.get(0);
 			}
 			return null;
-			
+
 		} catch (Exception e) {
 			throw new DAOException("Database Error @ ShowDetailsDaoImpl ::" + e.getMessage(), e.getCause());
 		}
+	}
+
+	@Override
+	public List<ShowDetails> getTopRatedShowsByImdbRating(Integer max) throws DAOException {
+		try {
+			Query query = getSession().createQuery("from " + getEntityName() + " order by imdbRating desc");
+			query.setMaxResults(max);
+			@SuppressWarnings("unchecked")
+			List<ShowDetails> ratingList = (List<ShowDetails>) query.list();
+			if (ratingList.size() > 0) {
+				return ratingList;
+			}
+			return null;
+		} catch (Exception e){
+			throw new DAOException("Database Error @ RatingDaoImpl ::" + e.getMessage(), e.getCause());
+		}
+
+	}
+	
+	@Override
+	public List<ShowDetails> getTopRatedShowsByShowFlixRating(Integer max) throws DAOException {
+		try {
+			Query query = getSession().createQuery("from " + getEntityName() + " order by showFlixRating desc");
+			query.setMaxResults(max);
+			@SuppressWarnings("unchecked")
+			List<ShowDetails> ratingList = (List<ShowDetails>) query.list();
+			if (ratingList.size() > 0) {
+				return ratingList;
+			}
+			return null;
+		} catch (Exception e){
+			throw new DAOException("Database Error @ RatingDaoImpl ::" + e.getMessage(), e.getCause());
+		}
+
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<ShowDetails> findAllShowDetails() throws DAOException {
 		try {
-			Query query  = getSession().createQuery("from "+getEntityName());
+			Query query = getSession().createQuery("from " + getEntityName());
 			return (List<ShowDetails>) query.list();
 		} catch (Exception e) {
 			throw new DAOException("Database Error @ ShowDetailsDaoImpl ::" + e.getMessage(), e.getCause());

@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.showflix.app.controller.exception.InternalServerException;
+import com.showflix.app.controller.exception.NoRatingsFoundException;
 import com.showflix.app.controller.exception.ShowDetailsAlreadyExistsException;
 import com.showflix.app.controller.exception.ShowDetailsNotFoundException;
+import com.showflix.app.controller.exception.UnknownSourceException;
 import com.showflix.app.dto.Details;
 import com.showflix.app.dto.Message;
 import com.showflix.app.service.IShowService;
@@ -36,17 +38,17 @@ public class Showcontroller {
 	@ApiOperation(value = "Find All Shows", notes = "Returns a list of the shows in the system.<br>Filters using an optional name parameter")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public List<Details> findAll(@RequestParam(required = false, value = "name") String filterByName) throws InternalServerException, ShowDetailsNotFoundException {
+	public List<Details> findAll(@RequestParam(required = false, value = "name") String filterByName)
+			throws InternalServerException, ShowDetailsNotFoundException {
 		List<Details> shows = null;
 		try {
-			if(filterByName!=null){
-			shows = showService.getShowByname(filterByName);
-			}
-			else{
+			if (filterByName != null) {
+				shows = showService.getShowByname(filterByName);
+			} else {
 				shows = showService.getAllShows();
 			}
-			
-			if(shows == null){
+
+			if (shows == null) {
 				throw new ShowDetailsNotFoundException();
 			}
 		} catch (ServiceException e) {
@@ -61,11 +63,12 @@ public class Showcontroller {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 404, message = "Not Found"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public Details findOne(@PathVariable("imdbId") String imdbId) throws ShowDetailsNotFoundException, InternalServerException {
+	public Details findOne(@PathVariable("imdbId") String imdbId)
+			throws ShowDetailsNotFoundException, InternalServerException {
 		Details showDetails = null;
 		try {
 			showDetails = showService.getShowByImdbId(imdbId);
-			if(showDetails==null){
+			if (showDetails == null) {
 				throw new ShowDetailsNotFoundException();
 			}
 		} catch (ServiceException e) {
@@ -132,4 +135,32 @@ public class Showcontroller {
 		message.setMessage("Show deleted Successfully");
 		return message;
 	}
+
+	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Get top rated shows", notes = "Expects param max to restrice the number of "
+			+ "shows in result and returns a list of top rated shows along with their ratings")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 500, message = "Internal Server Error"),
+			@ApiResponse(code = 400, message = "Bad Request") })
+	public List<Details> getTopRatedShows(@RequestParam(value = "max") Integer max,
+			@RequestParam(value = "ratingSource") String ratingSource)
+					throws InternalServerException, NoRatingsFoundException, UnknownSourceException {
+		List<Details> topRatedShows = null;
+		try {
+			if (ratingSource.equals("imdb")) {
+				topRatedShows = showService.getTopRatedShowsByImdbRating(max);
+			} else if (ratingSource.equals("showFlix")) {
+				topRatedShows = showService.getTopRatedShowsByShowFlixRating(max);
+			} else {
+				throw new UnknownSourceException();
+			}
+		} catch (ShowDetailsNotFoundException e) {
+			return null;
+		} catch (ServiceException e) {
+			throw new InternalServerException();
+		}
+
+		return topRatedShows;
+	}
+
 }

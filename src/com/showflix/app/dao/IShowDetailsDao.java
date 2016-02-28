@@ -21,5 +21,9 @@ public interface IShowDetailsDao {
 	List<ShowDetails> findAllShowDetails() throws DAOException;
 
 	List<ShowDetails> findShowDetailsByName(String name) throws DAOException;
+
+	List<ShowDetails> getTopRatedShowsByImdbRating(Integer max) throws DAOException;
+
+	List<ShowDetails> getTopRatedShowsByShowFlixRating(Integer max) throws DAOException;
 	
 }

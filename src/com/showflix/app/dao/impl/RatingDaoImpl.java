@@ -10,7 +10,6 @@ import com.showflix.app.dao.IRatingDao;
 import com.showflix.app.dao.entity.ShowRating;
 import com.showflix.app.dao.exceptions.DAOException;
 
-
 @Repository("ratingDao")
 public class RatingDaoImpl extends AbstractDao<Integer, ShowRating> implements IRatingDao {
 
@@ -58,6 +57,22 @@ public class RatingDaoImpl extends AbstractDao<Integer, ShowRating> implements I
 			List<ShowRating> ratingList = (List<ShowRating>) query.list();
 			if (ratingList.size() > 0) {
 				return ratingList.get(0);
+			}
+			return null;
+		} catch (Exception e) {
+			throw new DAOException("Database Error @ RatingDaoImpl ::" + e.getMessage(), e.getCause());
+		}
+	}
+
+	@Override
+	public List<ShowRating> getAllRatingsHighToLow(Integer max) throws DAOException {
+		try {
+			Query query = getSession().createQuery("from " + getEntityName() + " order by rating desc");
+			query.setMaxResults(max);
+			@SuppressWarnings("unchecked")
+			List<ShowRating> ratingList = (List<ShowRating>) query.list();
+			if (ratingList.size() > 0) {
+				return ratingList;
 			}
 			return null;
 		} catch (Exception e) {

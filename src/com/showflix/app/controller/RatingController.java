@@ -24,20 +24,21 @@ import io.swagger.annotations.ApiResponses;
 
 @RestController
 @RequestMapping("/rating")
-@Api(tags="rating")
+@Api(tags = "rating")
 public class RatingController {
-	
+
 	@Autowired
 	IRatingService ratingService;
+
 	
-	@RequestMapping(value = "{imdbId}" ,method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "{imdbId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Get Rating for a show", notes = "Returns average rating for a particular show")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public RatingInfo findAll(@PathVariable("imdbId") String imdbId) throws InternalServerException {
+	public RatingInfo getAverageRatingForShow(@PathVariable("imdbId") String imdbId) throws InternalServerException {
 		Double rating = 0.0;
-		try{
-		rating = ratingService.getAvgRatingForShow(imdbId);
+		try {
+			rating = ratingService.getAvgRatingForShow(imdbId);
 		} catch (ServiceException e) {
 			throw new InternalServerException();
 		}
@@ -45,20 +46,19 @@ public class RatingController {
 		RatingInfo ratingInfo = new RatingInfo(rating);
 		return ratingInfo;
 	}
-	
-	
+
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Add Rating", notes = "Adds Rating for a particular show")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 400, message = "Bad Request"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public Message create(@RequestBody ShowRating rating,HttpServletRequest request)
+	public Message createRating(@RequestBody ShowRating rating, HttpServletRequest request)
 			throws InternalServerException {
 		try {
-			String role =(String)request.getAttribute("role");
-			if(role!=null && role.equals("user")){
-				rating.setUserName((String)request.getAttribute("user"));
-			ratingService.addRating(rating);
+			String role = (String) request.getAttribute("role");
+			if (role != null && role.equals("user")) {
+				rating.setUserName((String) request.getAttribute("user"));
+				ratingService.addRating(rating);
 			}
 
 		} catch (ServiceException e) {
@@ -69,5 +69,3 @@ public class RatingController {
 		return message;
 	}
 }
-
-

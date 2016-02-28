@@ -9,4 +9,5 @@ public interface IRatingService {
 	
 	public double getAvgRatingForShow(String imdbId) throws ServiceException;
 	
+	
 }
