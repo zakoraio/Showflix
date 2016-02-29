@@ -2,6 +2,8 @@ package com.showflix.app.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.showflix.app.constants.ApplicationConstants;
 import com.showflix.app.controller.exception.InternalServerException;
 import com.showflix.app.controller.exception.NoRatingsFoundException;
 import com.showflix.app.controller.exception.ShowDetailsAlreadyExistsException;
 import com.showflix.app.controller.exception.ShowDetailsNotFoundException;
+import com.showflix.app.controller.exception.UnauthorizedException;
 import com.showflix.app.controller.exception.UnknownSourceException;
 import com.showflix.app.dto.Details;
 import com.showflix.app.dto.Message;
@@ -38,19 +42,24 @@ public class Showcontroller {
 	@ApiOperation(value = "Find All Shows", notes = "Returns a list of the shows in the system.<br>Filters using an optional name parameter")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public List<Details> findAll(@RequestParam(required = false, value = "name") String filterByName)
-			throws InternalServerException, ShowDetailsNotFoundException {
+	public List<Details> findAll(@RequestParam(required = false, value = "name") String filterByName,
+			HttpServletRequest request)
+					throws InternalServerException, ShowDetailsNotFoundException, UnauthorizedException {
 		List<Details> shows = null;
 		try {
-			if (filterByName != null) {
-				shows = showService.getShowByname(filterByName);
-			} else {
-				shows = showService.getAllShows();
-			}
+			String role = (String) request.getAttribute(ApplicationConstants.role);
+			if (role != null && (role.equals(ApplicationConstants.user) || role.equals(ApplicationConstants.admin))) {
+				if (filterByName != null) {
+					shows = showService.getShowByname(filterByName);
+				} else {
+					shows = showService.getAllShows();
+				}
 
-			if (shows == null) {
-				throw new ShowDetailsNotFoundException();
-			}
+				if (shows == null) {
+					throw new ShowDetailsNotFoundException();
+				}
+			} else
+				throw new UnauthorizedException();
 		} catch (ServiceException e) {
 			throw new InternalServerException();
 		}
@@ -63,14 +72,18 @@ public class Showcontroller {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 404, message = "Not Found"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public Details findOne(@PathVariable("imdbId") String imdbId)
-			throws ShowDetailsNotFoundException, InternalServerException {
+	public Details findOne(@PathVariable("imdbId") String imdbId, HttpServletRequest request)
+			throws ShowDetailsNotFoundException, InternalServerException, UnauthorizedException {
 		Details showDetails = null;
 		try {
-			showDetails = showService.getShowByImdbId(imdbId);
-			if (showDetails == null) {
-				throw new ShowDetailsNotFoundException();
-			}
+			String role = (String) request.getAttribute(ApplicationConstants.role);
+			if (role != null && (role.equals(ApplicationConstants.user) || role.equals(ApplicationConstants.admin))) {
+				showDetails = showService.getShowByImdbId(imdbId);
+				if (showDetails == null) {
+					throw new ShowDetailsNotFoundException();
+				}
+			} else
+				throw new UnauthorizedException();
 		} catch (ServiceException e) {
 			throw new InternalServerException();
 		}
@@ -83,10 +96,14 @@ public class Showcontroller {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 400, message = "Bad Request"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public Message create(@RequestBody Details details)
-			throws ShowDetailsAlreadyExistsException, InternalServerException {
+	public Message create(@RequestBody Details details, HttpServletRequest request)
+			throws ShowDetailsAlreadyExistsException, InternalServerException, UnauthorizedException {
 		try {
-			showService.insertShowDetails(details);
+			String role = (String) request.getAttribute(ApplicationConstants.role);
+			if (role != null && role.equals(ApplicationConstants.admin)) {
+				showService.insertShowDetails(details);
+			} else
+				throw new UnauthorizedException();
 
 		} catch (ServiceException e) {
 			throw new InternalServerException();
@@ -101,14 +118,20 @@ public class Showcontroller {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 400, message = "Bad Request"), @ApiResponse(code = 404, message = "Not Found"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public Message update(@PathVariable("imdbId") String imdbId, @RequestBody Details details)
-			throws ShowDetailsNotFoundException, InternalServerException {
+	public Message update(@PathVariable("imdbId") String imdbId, @RequestBody Details details,
+			HttpServletRequest request)
+					throws ShowDetailsNotFoundException, InternalServerException, UnauthorizedException {
+
 		try {
-			Details existingShowDetails = showService.getShowByImdbId(imdbId);
-			if (existingShowDetails == null) {
-				throw new ShowDetailsNotFoundException();
-			}
-			showService.updateShowDetails(details);
+			String role = (String) request.getAttribute(ApplicationConstants.role);
+			if (role != null && role.equals(ApplicationConstants.admin)) {
+				Details existingShowDetails = showService.getShowByImdbId(imdbId);
+				if (existingShowDetails == null) {
+					throw new ShowDetailsNotFoundException();
+				}
+				showService.updateShowDetails(details);
+			} else
+				throw new UnauthorizedException();
 		} catch (ServiceException e) {
 			throw new InternalServerException();
 		}
@@ -122,38 +145,46 @@ public class Showcontroller {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 404, message = "Not Found"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public Message delete(@PathVariable("imdbId") String imdbId)
-			throws ShowDetailsNotFoundException, InternalServerException {
-
-		try {
-			showService.deleteShow(imdbId);
-		} catch (ServiceException e) {
-			throw new InternalServerException();
-		}
-
+	public Message delete(@PathVariable("imdbId") String imdbId, HttpServletRequest request)
+			throws ShowDetailsNotFoundException, InternalServerException, UnauthorizedException {
+		String role = (String) request.getAttribute(ApplicationConstants.role);
+		if (role != null && role.equals(ApplicationConstants.admin)) {
+			try {
+				showService.deleteShow(imdbId);
+			} catch (ServiceException e) {
+				throw new InternalServerException();
+			}
+		} else
+			throw new UnauthorizedException();
 		Message message = new Message();
 		message.setMessage("Show deleted Successfully");
 		return message;
 	}
 
-	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/toprated" , method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Get top rated shows", notes = "Expects param max to restrice the number of "
 			+ "shows in result and returns a list of top rated shows along with their ratings")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 500, message = "Internal Server Error"),
 			@ApiResponse(code = 400, message = "Bad Request") })
 	public List<Details> getTopRatedShows(@RequestParam(value = "max") Integer max,
-			@RequestParam(value = "ratingSource") String ratingSource)
-					throws InternalServerException, NoRatingsFoundException, UnknownSourceException {
+			@RequestParam(value = "ratingSource") String ratingSource, HttpServletRequest request)
+					throws InternalServerException, NoRatingsFoundException, UnknownSourceException,
+					UnauthorizedException {
 		List<Details> topRatedShows = null;
+
 		try {
-			if (ratingSource.equals("imdb")) {
-				topRatedShows = showService.getTopRatedShowsByImdbRating(max);
-			} else if (ratingSource.equals("showFlix")) {
-				topRatedShows = showService.getTopRatedShowsByShowFlixRating(max);
-			} else {
-				throw new UnknownSourceException();
-			}
+			String role = (String) request.getAttribute(ApplicationConstants.role);
+			if (role != null && (role.equals(ApplicationConstants.user) || role.equals(ApplicationConstants.admin))) {
+				if (ratingSource.equals("imdb")) {
+					topRatedShows = showService.getTopRatedShowsByImdbRating(max);
+				} else if (ratingSource.equals("showFlix")) {
+					topRatedShows = showService.getTopRatedShowsByShowFlixRating(max);
+				} else {
+					throw new UnknownSourceException();
+				}
+			} else
+				throw new UnauthorizedException();
 		} catch (ShowDetailsNotFoundException e) {
 			return null;
 		} catch (ServiceException e) {

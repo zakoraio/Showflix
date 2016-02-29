@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.showflix.app.constants.ApplicationConstants;
 import com.showflix.app.controller.exception.InternalServerException;
 import com.showflix.app.controller.exception.UnauthorizedException;
 import com.showflix.app.controller.exception.UserAlreadyExistsException;
@@ -39,11 +40,17 @@ public class Usercontroller {
 	@ApiOperation(value = "Find All Users", notes = "Returns a list of the users in the system.<br>Filters using an optional name parameter")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public List<User> findAll(@RequestParam(required = false, value = "name") String filterByName)
-			throws InternalServerException {
+	public List<User> findAll(@RequestParam(required = false, value = ApplicationConstants.name) String filterByName,HttpServletRequest request)
+			throws InternalServerException, UnauthorizedException {
 		List<User> users = null;
 		try {
 			users = userService.getUserByFirstName(filterByName);
+			String role = (String) request.getAttribute(ApplicationConstants.role);
+			if (role!=null && (role.equals(ApplicationConstants.user) || role.equals(ApplicationConstants.admin))) {
+				users = userService.getUserByFirstName(filterByName);
+			} else
+				throw new UnauthorizedException();
+			
 		} catch (ServiceException e) {
 			throw new InternalServerException();
 		}
@@ -52,15 +59,20 @@ public class Usercontroller {
 	}
 
 	@RequestMapping(value = "{userName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Find User By Id", notes = "Returns a user by it's id if it exists.")
+	@ApiOperation(value = "Find User By Id", notes = "Returns a user by it's userName if it exists.")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 404, message = "Not Found"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public User findOne(@PathVariable("userName") String userName)
-			throws UserNotFoundException, InternalServerException {
+	public User findOne(@PathVariable(ApplicationConstants.userName) String userName , HttpServletRequest request)
+			throws UserNotFoundException, InternalServerException, UnauthorizedException {
 		User user = null;
 		try {
-			user = userService.getUserbyUserName(userName);
+			String role = (String) request.getAttribute(ApplicationConstants.role);
+			if (role!=null && (role.equals(ApplicationConstants.user) || role.equals(ApplicationConstants.admin))) {
+				user = userService.getUserbyUserName(userName);
+			} else
+				throw new UnauthorizedException();
+			
 			if (user == null) {
 				throw new UserNotFoundException();
 			}
@@ -79,8 +91,8 @@ public class Usercontroller {
 	public Message create(@RequestBody User user, HttpServletRequest request)
 			throws InternalServerException, UserAlreadyExistsException, UnauthorizedException {
 		try {
-			String role = (String) request.getAttribute("role");
-			if (role!=null && role.equals("user")) {
+			String role = (String) request.getAttribute(ApplicationConstants.role);
+			if (role!=null && (role.equals(ApplicationConstants.user) || role.equals(ApplicationConstants.admin))) {
 				userService.addUser(user);
 			} else
 				throw new UnauthorizedException();
@@ -98,10 +110,11 @@ public class Usercontroller {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 400, message = "Bad Request"), @ApiResponse(code = 404, message = "Not Found"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public Message update(@PathVariable("userName") String userName, @RequestBody User user, HttpServletRequest request)
+	public Message update(@PathVariable(ApplicationConstants.userName) String userName, @RequestBody User user, HttpServletRequest request)
 			throws UserNotFoundException, InternalServerException, UnauthorizedException {
 		try {
-			if (request.getAttribute("role").equals("user")) {
+			String role = (String) request.getAttribute(ApplicationConstants.role);
+			if (role!=null && (role.equals(ApplicationConstants.user) || role.equals(ApplicationConstants.admin))) {
 
 				User updatedUser = userService.updateUser(user);
 				if (updatedUser == null)
@@ -121,13 +134,19 @@ public class Usercontroller {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 404, message = "Not Found"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
-	public Message delete(@PathVariable("userName") String userName,HttpServletRequest request)
-			throws UserNotFoundException, InternalServerException {
+	public Message delete(@PathVariable(ApplicationConstants.userName) String userName,HttpServletRequest request)
+			throws UserNotFoundException, InternalServerException, UnauthorizedException {
 		try {
+			String role = (String) request.getAttribute(ApplicationConstants.role);
+			if (role!=null && (role.equals(ApplicationConstants.user) || role.equals(ApplicationConstants.admin))) {
 				User user = userService.deleteUser(userName);
 				if(user == null){
 					throw new UserNotFoundException();
 				}
+			}
+			else
+				throw new UnauthorizedException();
+				
 		} catch (ServiceException e) {
 			throw new InternalServerException();
 		}

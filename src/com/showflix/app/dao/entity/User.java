@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -23,40 +24,41 @@ import org.hibernate.annotations.Type;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(uniqueConstraints=
-@UniqueConstraint(columnNames = {"userName"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "userName" }) )
 public class User {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name ="UserId")
+	@Column(name = "UserId")
 	private Integer id;
-	@Column(name ="FirstName",nullable = false)
+	@Column(name = "FirstName", nullable = false)
 	private String firstName;
-	@Column(name ="LastName")
+	@Column(name = "LastName")
 	private String lastName;
-	@Column(name ="UserName",nullable = false)
+	@Column(name = "UserName", nullable = false)
 	private String userName;
-	@Column(name ="Password",nullable = false)
+	@Column(name = "Password", nullable = false)
 	private String password;
-	@Column(name= "Email",nullable = false)
+	@Column(name = "Email", nullable = false)
 	private String email;
-	
+
 	@JsonIgnore
-	@ManyToMany(cascade = CascadeType.PERSIST,fetch =FetchType.EAGER)
-	@JoinTable(name = "UserRoles", joinColumns = @JoinColumn(name = "UserID") , 
-						   inverseJoinColumns = @JoinColumn(name = "RoleID") )
-	@GenericGenerator(name="hilo-gen",strategy="hilo")
-	@CollectionId(
-		        columns = @Column(name="UserRoleId"), 
-		        type=@Type(type="long"), 
-		        generator = "hilo-gen"
-		    )
+	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	@JoinTable(name = "UserRoles", joinColumns = @JoinColumn(name = "UserID") , inverseJoinColumns = @JoinColumn(name = "RoleID") )
+	@GenericGenerator(name = "hilo-gen", strategy = "hilo")
+	@CollectionId(columns = @Column(name = "UserRoleId") , type = @Type(type = "long") , generator = "hilo-gen")
 	private Collection<Role> roles;
-	
-	
-	public User(){
+
+	@JsonIgnore
+	@OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	@JoinTable(name = "UserComments", joinColumns = @JoinColumn(name = "UserID") , inverseJoinColumns = @JoinColumn(name = "CommentID") )
+	@GenericGenerator(name = "hilo-gen", strategy = "hilo")
+	@CollectionId(columns = @Column(name = "UserCommentID") , type = @Type(type = "long") , generator = "hilo-gen")
+	private Collection<Comment> comments;
+
+	public User() {
 		roles = new ArrayList<Role>();
+		comments = new ArrayList<Comment>();
 	}
 
 	public Integer getId() {
@@ -115,8 +117,15 @@ public class User {
 		this.email = email;
 	}
 
+	public Collection<Comment> getComments() {
+		return comments;
+	}
 
-	public void fetch(User user){
+	public void setComments(Collection<Comment> comments) {
+		this.comments = comments;
+	}
+
+	public void fetch(User user) {
 		this.email = user.email;
 		this.firstName = user.firstName;
 		this.lastName = user.lastName;
