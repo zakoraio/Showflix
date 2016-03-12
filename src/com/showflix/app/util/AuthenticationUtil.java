@@ -17,7 +17,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
  */
 public class AuthenticationUtil {
     
-    public static final String tokenHeader = "Authentication-Token";
+    public static final String tokenHeader = "authentication-token";
     
     public static boolean hasAuthenticationToken(HttpServletRequest context) {
         System.out.println(context.getHeader(tokenHeader));

@@ -38,7 +38,6 @@ public class Details {
 	private String type;
 	private String showflixRating;
 
-
 	public String getTitle() {
 		return title;
 	}
@@ -199,7 +198,7 @@ public class Details {
 		this.showflixRating = showflixRating;
 	}
 
-	public void fetch(ShowDetails details){
+	public void fetch(ShowDetails details) {
 		title = details.getTitle();
 		year = details.getYear();
 		Calendar cal = Calendar.getInstance();
@@ -215,14 +214,17 @@ public class Details {
 		imdbVotes = details.getImdbVotes().toString();
 		imdbID = details.getImdbId();
 		type = details.getType();
-		showflixRating = details.getShowFlixRating().toString();
-		genre = getConcatinatedString((List<Genere>)details.getGeneres(),Genere.class);
-		actors = getConcatinatedString((List<Actors>)details.getActors(),Actors.class);
-		director = getConcatinatedString((List<Directors>)details.getDirectors(),Directors.class);
-		writer = getConcatinatedString((List<Writers>)details.getWriters(),Writers.class);
-		awards = getConcatinatedString((List<Awards>)details.getAwards(),Awards.class);
-		language = getConcatinatedString((List<Languages>)details.getLanguages(),Languages.class);
-		country = getConcatinatedString((List<Countries>)details.getCountries(),Countries.class);
+		if (details.getShowFlixRating() != null)
+			showflixRating = details.getShowFlixRating().toString();
+		else
+			showflixRating = "";
+		genre = getConcatinatedString((List<Genere>) details.getGeneres(), Genere.class);
+		actors = getConcatinatedString((List<Actors>) details.getActors(), Actors.class);
+		director = getConcatinatedString((List<Directors>) details.getDirectors(), Directors.class);
+		writer = getConcatinatedString((List<Writers>) details.getWriters(), Writers.class);
+		awards = getConcatinatedString((List<Awards>) details.getAwards(), Awards.class);
+		language = getConcatinatedString((List<Languages>) details.getLanguages(), Languages.class);
+		country = getConcatinatedString((List<Countries>) details.getCountries(), Countries.class);
 	}
 
 	private <T> String getConcatinatedString(List<T> list, Class<T> type) {
@@ -232,12 +234,11 @@ public class Details {
 			m = type.getMethod("getName");
 			int count = 0;
 			for (T t : list) {
-				if(count ==0){
-				s += (String) m.invoke(t);
-				count++;
-				}
-				else{
-					s +=", " + (String) m.invoke(t);
+				if (count == 0) {
+					s += (String) m.invoke(t);
+					count++;
+				} else {
+					s += ", " + (String) m.invoke(t);
 				}
 			}
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {

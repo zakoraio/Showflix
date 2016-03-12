@@ -20,6 +20,7 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.showflix.app.config.HibernateConfiguration;
+import com.showflix.app.controller.exception.UserAlreadyExistsException;
 import com.showflix.app.dao.entity.User;
 import com.showflix.app.dto.Details;
 import com.showflix.app.service.IShowService;
@@ -50,7 +51,7 @@ public class ShowServiceTest extends AbstractTransactionalJUnit4SpringContextTes
 	}*/
 	
 	@Test 
-	public void testUserService() throws ServiceException{
+	public void testUserService() throws ServiceException, UserAlreadyExistsException{
 		User user = new User();
 		
 		user.setFirstName("Saurabh");
