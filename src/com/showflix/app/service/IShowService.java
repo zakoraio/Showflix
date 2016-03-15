@@ -3,6 +3,8 @@ package com.showflix.app.service;
 import java.util.List;
 
 import com.showflix.app.controller.exception.ShowDetailsNotFoundException;
+import com.showflix.app.dao.entity.Comment;
+import com.showflix.app.dto.CommentDto;
 import com.showflix.app.dto.Details;
 import com.showflix.app.service.exceptions.ServiceException;
 
@@ -25,6 +27,10 @@ public interface IShowService {
 	public List<Details> getTopRatedShowsByImdbRating(Integer max) throws ShowDetailsNotFoundException, ServiceException;
 
 	List<Details> getTopRatedShowsByShowFlixRating(Integer max) throws ShowDetailsNotFoundException, ServiceException;
+	
+	public List<CommentDto> getComments(String imdbId) throws ServiceException, ShowDetailsNotFoundException;
+	
+	public void addComment(Comment comment) throws ServiceException;
 
 	
 }

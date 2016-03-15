@@ -4,7 +4,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.showflix.app.dao.entity.Actors;
 import com.showflix.app.dao.entity.Awards;
@@ -205,7 +207,7 @@ public class Details {
 		Date date = new java.sql.Date(details.getReleased().getTime());
 		cal.setTime(date);
 		rated = details.getRated();
-		released = cal.get(Calendar.MONTH) + " " + cal.get(Calendar.YEAR);
+		released = months.get(""+cal.get(Calendar.MONTH)) + " " + cal.get(Calendar.YEAR);
 		runtime = details.getRuntime().toString();
 		plot = details.getPlot();
 		poster = details.getPoster();
@@ -250,4 +252,24 @@ public class Details {
 		return s.trim();
 
 	}
+	
+	
+	static Map<String, String> months;
+
+	static {
+		months = new HashMap<String, String>();
+		months.put("1","Jan");
+		months.put("2","Feb");
+		months.put("3","Mar");
+		months.put("4","Apr");
+		months.put("5","May");
+		months.put("6","Jun");
+		months.put("7","Jul");
+		months.put("8","Aug");
+		months.put("9","Sep");
+		months.put("10","Oct");
+		months.put("11","Nov");
+		months.put("12","Dec");
+	}
+	
 }

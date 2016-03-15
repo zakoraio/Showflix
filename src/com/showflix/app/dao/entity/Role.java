@@ -58,5 +58,12 @@ public class Role {
 	public void setUsers(Collection<User> users) {
 		this.users = users;
 	}
+	
+	public boolean equals(Object o){
+		if(o instanceof Role){
+			return ((Role)o).getName().equals(this.name);
+		}
+		return false;
+	}
 
 }

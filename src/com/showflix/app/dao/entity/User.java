@@ -49,16 +49,8 @@ public class User {
 	@CollectionId(columns = @Column(name = "UserRoleId") , type = @Type(type = "long") , generator = "hilo-gen")
 	private Collection<Role> roles;
 
-	@JsonIgnore
-	@OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-	@JoinTable(name = "UserComments", joinColumns = @JoinColumn(name = "UserID") , inverseJoinColumns = @JoinColumn(name = "CommentID") )
-	@GenericGenerator(name = "hilo-gen", strategy = "hilo")
-	@CollectionId(columns = @Column(name = "UserCommentID") , type = @Type(type = "long") , generator = "hilo-gen")
-	private Collection<Comment> comments;
-
 	public User() {
 		roles = new ArrayList<Role>();
-		comments = new ArrayList<Comment>();
 	}
 
 	public Integer getId() {
@@ -115,14 +107,6 @@ public class User {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public Collection<Comment> getComments() {
-		return comments;
-	}
-
-	public void setComments(Collection<Comment> comments) {
-		this.comments = comments;
 	}
 
 	public void fetch(User user) {

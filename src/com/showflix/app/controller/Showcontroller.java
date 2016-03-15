@@ -20,6 +20,8 @@ import com.showflix.app.controller.exception.ShowDetailsAlreadyExistsException;
 import com.showflix.app.controller.exception.ShowDetailsNotFoundException;
 import com.showflix.app.controller.exception.UnauthorizedException;
 import com.showflix.app.controller.exception.UnknownSourceException;
+import com.showflix.app.dao.entity.Comment;
+import com.showflix.app.dto.CommentDto;
 import com.showflix.app.dto.Details;
 import com.showflix.app.dto.Message;
 import com.showflix.app.service.IShowService;
@@ -161,7 +163,7 @@ public class Showcontroller {
 		return message;
 	}
 
-	@RequestMapping(value = "/toprated" , method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/toprated", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Get top rated shows", notes = "Expects param max to restrice the number of "
 			+ "shows in result and returns a list of top rated shows along with their ratings")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
@@ -192,6 +194,49 @@ public class Showcontroller {
 		}
 
 		return topRatedShows;
+	}
+
+	@RequestMapping(value = "/comments", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Add Comment", notes = "Create a comment for a show")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 400, message = "Bad Request"),
+			@ApiResponse(code = 500, message = "Internal Server Error") })
+	public Message addComment(@RequestBody Comment comment, HttpServletRequest request)
+			throws InternalServerException, UnauthorizedException {
+		try {
+			String role = (String) request.getAttribute(ApplicationConstants.role);
+			if (role != null && role.equals(ApplicationConstants.admin) || role.equals(ApplicationConstants.user)) {
+				showService.addComment(comment);
+			} else
+				throw new UnauthorizedException();
+
+		} catch (ServiceException e) {
+			throw new InternalServerException();
+		}
+		Message message = new Message();
+		message.setMessage("Comment Added Successfully");
+		return message;
+	}
+
+	@RequestMapping(value = "/comments/{imdbId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Find Comments By Id", notes = "Returns all comments for a show if they exist.")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 404, message = "Not Found"),
+			@ApiResponse(code = 500, message = "Internal Server Error") })
+	public List<CommentDto> getComments(@PathVariable("imdbId") String imdbId, HttpServletRequest request)
+			throws ShowDetailsNotFoundException, InternalServerException, UnauthorizedException {
+		List<CommentDto> comments = null;
+		try {
+			String role = (String) request.getAttribute(ApplicationConstants.role);
+			if (role != null && (role.equals(ApplicationConstants.user) || role.equals(ApplicationConstants.admin))) {
+				comments = showService.getComments(imdbId);
+			} else
+				throw new UnauthorizedException();
+		} catch (ServiceException e) {
+			throw new InternalServerException();
+		}
+		return comments;
+
 	}
 
 }

@@ -87,7 +87,13 @@ public class ShowDetails {
 		year = details.getYear();
 		SimpleDateFormat format = new SimpleDateFormat("dd MM yyyy");
 		String[] dateComponents = details.getReleased().split(" ");
-		Date parsed = format.parse(dateComponents[0] + " " + months.get(dateComponents[1]) + " " + dateComponents[2]);
+		Date parsed = null;
+		if(dateComponents.length==3){
+		 parsed = format.parse(dateComponents[0] + " " + months.get(dateComponents[1]) + " " + dateComponents[2]);
+		}
+		else{
+			parsed = format.parse("1" + " " + months.get(dateComponents[0]) + " " + dateComponents[1]);
+		}
 		java.sql.Date sqlDate = new java.sql.Date(parsed.getTime());
 		rated = details.getRated();
 		released = sqlDate;

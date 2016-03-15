@@ -49,13 +49,17 @@ public class LoginController {
 	public LoginResponse login(@RequestBody(required=true) LoginInfo loginInfo) throws InternalServerException, UserNotFoundException {
 		User user = null;
 		List<Role> roles = null;
-		LoginResponse response = null;
+		LoginResponse response = new LoginResponse(null,"Invalid Username/Password");
 		try {
 			user = userService.getUserbyUserName(loginInfo.getUserName());
 			if(user.getPassword().equals(loginInfo.getPassword())){
 				roles = (List<Role>) user.getRoles();
+				Role tmpRole = new Role();
+				tmpRole.setName(loginInfo.getRole());
+				if(roles.contains(tmpRole)){
 				String token = AuthenticationUtil.generateToken(loginInfo.getUserName(), roles.get(0).getName(), ApplicationConstants.secretKey);
-				response = new LoginResponse(token);
+				response = new LoginResponse(token,"Login Successful");
+				}
 			}
 		} catch (ServiceException e) {
 			throw new InternalServerException();

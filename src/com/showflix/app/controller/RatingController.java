@@ -56,7 +56,7 @@ public class RatingController {
 			throws InternalServerException {
 		try {
 			String role = (String) request.getAttribute("role");
-			if (role != null && role.equals("user")) {
+			if (role != null && (role.equals("user")||(role.equals("admin")))) {
 				rating.setUserName((String) request.getAttribute("user"));
 				ratingService.addRating(rating);
 			}

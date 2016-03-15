@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.showflix.app.constants.ApplicationConstants;
+import com.showflix.app.controller.exception.UnauthorizedException;
 import com.showflix.app.util.AuthenticationUtil;
 
 import io.jsonwebtoken.Claims;
@@ -24,10 +25,10 @@ public class AuthenticationFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
-
+		final HttpServletRequest request = (HttpServletRequest) req;
+		final HttpServletResponse response = (HttpServletResponse) res;
 		try {
-			final HttpServletRequest request = (HttpServletRequest) req;
-			final HttpServletResponse response = (HttpServletResponse)res;
+
 			if (request.getMethod().equalsIgnoreCase("options")) {
 				response.addHeader("Access-Control-Allow-Headers", request.getHeader("Access-Control-Request-Headers"));
 				response.addHeader("Access-Control-Allow-Methods", "GET PUT POST");
@@ -35,24 +36,25 @@ public class AuthenticationFilter implements Filter {
 				request.setAttribute("Options", "true");
 			} else {
 				if (!AuthenticationUtil.hasAuthenticationToken(request)) {
-					throw new ServletException("Missing or invalid Authorization header.");
+					throw new UnauthorizedException();
 				}
 				try {
 					final Claims claims = AuthenticationUtil.parseToken(request, ApplicationConstants.secretKey);
 					if (AuthenticationUtil.isExpired(claims)) {
-						throw new ServletException("Authentication token has expired");
+						throw new UnauthorizedException();
 					}
 
 					request.setAttribute("role", claims.get("role"));
 					request.setAttribute("user", claims.getSubject());
 				} catch (final SignatureException e) {
-					throw new ServletException("Invalid token.");
+					throw new UnauthorizedException();
 				}
 			}
 
 			chain.doFilter(request, response);
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (UnauthorizedException uae) {
+			response.setStatus(401);
+			System.out.println("Token is either invalid or expired");
 		}
 
 	}

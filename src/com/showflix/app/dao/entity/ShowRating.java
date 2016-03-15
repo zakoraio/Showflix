@@ -14,7 +14,7 @@ public class ShowRating {
 	@Column(name="RatingId")
 	private Integer id;
 	@Column(name="Rating")
-	private Integer rating;
+	private double rating;
 	@Column(name="UserName")
 	private String userName;
 	@Column(name="ImdbID")
@@ -29,11 +29,11 @@ public class ShowRating {
 		this.id = id;
 	}
 
-	public Integer getRating() {
+	public Double getRating() {
 		return rating;
 	}
 
-	public void setRating(Integer rating) {
+	public void setRating(Double rating) {
 		this.rating = rating;
 	}
 
