@@ -8,5 +8,6 @@ public class ApplicationConstants {
 	public final static String admin =  "admin";
 	public final static String name = "name";
 	public final static String userName = "userName";
+	public final static String authenticationHeader = "authentication-token";
 
 }
